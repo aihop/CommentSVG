@@ -18,6 +18,14 @@ Render GitHub Discussions comments as SVG images that can be directly embedded i
 
 ---
 
+## 演示 / Demo
+
+在线体验：https://github.com/aihop/Refactoring-the-Self
+
+![preview](perview.png)
+
+---
+
 ## 使用方式 / Usage
 
 ### 中文
