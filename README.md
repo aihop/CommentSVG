@@ -28,14 +28,12 @@ Render GitHub Discussions comments as SVG images that can be directly embedded i
 
 ```ts
 export const chapterMap = {
-  "01": 1,   // 01 章 → Discussion #1
-  "02": 2,   // 02 章 → Discussion #2
-  "03": 3,   // 03 章 → Discussion #3
+  "01-kicked-out-for-300": 2,  // 01 章 → Discussion #2
 };
 
 export const repoConfig = {
-  owner: "your-github-username",  // 改为你的 GitHub 用户名
-  name: "your-repo-name",         // 改为你的仓库名
+  owner: "aihop",               // GitHub 用户名
+  name: "Refactoring-the-Self", // 仓库名
 };
 ```
 
@@ -65,16 +63,16 @@ npx wrangler dev
 
 #### 4. 在 Markdown 中嵌入
 
-部署后，你会得到一个 Worker URL，例如 `https://commentsvg.your-subdomain.workers.dev`。
+部署后，你会得到一个 Worker URL。
 
-在 GitHub Markdown 文件中嵌入评论：
+在 GitHub Markdown 文件中嵌入评论（以本项目的 `reconstruct/01-kicked-out-for-300.svg` 为例）：
 
 ```md
 ## 💬 读者笔记
 
-![](https://commentsvg.your-subdomain.workers.dev/reconstruct/01.svg)
+![](https://commentsvg.coller.workers.dev/reconstruct/01-kicked-out-for-300.svg)
 
-👉 [参与讨论](https://github.com/your-username/your-repo/discussions/1)
+👉 [参与讨论](https://github.com/aihop/Refactoring-the-Self/discussions/2)
 ```
 
 #### 5. 查询参数
@@ -89,7 +87,7 @@ npx wrangler dev
 示例：
 
 ```md
-![](https://commentsvg.your-subdomain.workers.dev/reconstruct/01.svg?theme=dark&comments=5&compact=true&lang=zh)
+![](https://commentsvg.coller.workers.dev/reconstruct/01-kicked-out-for-300.svg?theme=dark&comments=5&compact=true&lang=zh)
 ```
 
 ---
@@ -102,14 +100,12 @@ Edit [src/config.ts](src/config.ts) to map your chapter identifiers to GitHub Di
 
 ```ts
 export const chapterMap = {
-  "01": 1,   // Chapter 01 → Discussion #1
-  "02": 2,   // Chapter 02 → Discussion #2
-  "03": 3,   // Chapter 03 → Discussion #3
+  "01-kicked-out-for-300": 2,  // Chapter 01 → Discussion #2
 };
 
 export const repoConfig = {
-  owner: "your-github-username",
-  name: "your-repo-name",
+  owner: "aihop",
+  name: "Refactoring-the-Self",
 };
 ```
 
@@ -139,16 +135,16 @@ npx wrangler dev
 
 #### 4. Embed in Markdown
 
-After deployment, you'll get a Worker URL like `https://commentsvg.your-subdomain.workers.dev`.
+After deployment, you'll get a Worker URL.
 
-Embed comments in your GitHub Markdown files:
+Embed comments in your GitHub Markdown files (using this project's `reconstruct/01-kicked-out-for-300.svg` as example):
 
 ```md
 ## 💬 Reader Notes
 
-![](https://commentsvg.your-subdomain.workers.dev/reconstruct/01.svg)
+![](https://commentsvg.coller.workers.dev/reconstruct/01-kicked-out-for-300.svg)
 
-👉 [Join Discussion](https://github.com/your-username/your-repo/discussions/1)
+👉 [Join Discussion](https://github.com/aihop/Refactoring-the-Self/discussions/1)
 ```
 
 #### 5. Query Parameters

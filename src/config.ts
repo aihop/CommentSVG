@@ -9,7 +9,8 @@
 export const chapterMap: Record<string, number> = {
   "01-kicked-out-for-300": 2,
   "02-experimental-class-list":4,
-  "03-four-hundred-ducks":3
+  "03-four-hundred-ducks":3,
+  "Refactoring-the-Self":5
 };
 
 /**

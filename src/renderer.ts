@@ -61,6 +61,34 @@ function escapeXml(str: string): string {
     .replace(/'/g, "&apos;");
 }
 
+/**
+ * Wrap text into lines that fit within maxChars per line.
+ * SVG <text> does not auto-wrap, so we manually split into <tspan> elements.
+ */
+function wrapText(text: string, maxChars: number): string[] {
+  const lines: string[] = [];
+  let remaining = text;
+  while (remaining.length > 0) {
+    if (remaining.length <= maxChars) {
+      lines.push(remaining);
+      break;
+    }
+    // Try to break at a space within maxChars
+    const slice = remaining.slice(0, maxChars);
+    const lastSpace = slice.lastIndexOf(" ");
+    if (lastSpace > maxChars * 0.3) {
+      // Break at word boundary
+      lines.push(slice.slice(0, lastSpace));
+      remaining = remaining.slice(lastSpace + 1);
+    } else {
+      // No good break point, hard break
+      lines.push(slice);
+      remaining = remaining.slice(maxChars);
+    }
+  }
+  return lines;
+}
+
 // ─── Main Render Function ────────────────────────────────────────────────────
 
 export function renderSVG(
@@ -74,29 +102,23 @@ export function renderSVG(
   const avatarSize = compact ? 28 : 36;
   const avatarGap = compact ? 16 : 20;
   const topPadding = 88;
+  const maxCharsPerLine = compact ? 60 : 55;
+  const lineHeight = compact ? 18 : 20;
 
   // Calculate dynamic positions
   let currentY = topPadding;
 
-  interface PositionedComment {
-    comment: typeof data.comments[0];
-    avatarY: number;
-    nameY: number;
-    nameY2: number;
-    bodyY: number;
-    reactionY: number;
-    commentHeight: number;
-  }
-
-  const positionedComments: PositionedComment[] = data.comments.map((comment) => {
+  const positionedComments = data.comments.map((comment) => {
     const commentStart = currentY;
     const authorNameY = currentY + avatarSize / 2 + 4;
     const dateY = authorNameY + 16;
+    const bodyLines = wrapText(comment.content, maxCharsPerLine);
     const bodyY = dateY + 20;
-    const reactionY = bodyY + 22;
+    const bodyEndY = bodyY + bodyLines.length * lineHeight;
+    const reactionY = bodyEndY + 6;
     const commentHeight = comment.reactionCount > 0
       ? reactionY + 4 - commentStart
-      : bodyY + 4 - commentStart;
+      : bodyEndY + 4 - commentStart;
 
     currentY += Math.max(avatarSize + avatarGap, commentHeight + avatarGap);
 
@@ -106,8 +128,8 @@ export function renderSVG(
       nameY: authorNameY,
       nameY2: dateY,
       bodyY,
+      bodyLines,
       reactionY,
-      commentHeight,
     };
   });
 
@@ -136,7 +158,7 @@ export function renderSVG(
   </defs>
 
   <!-- Background card -->
-  <rect width="800" height="${svgHeight}" rx="${radius}" fill="${colors.bg}" stroke="${colors.border}" stroke-width="1" />
+  <rect width="100%" height="${svgHeight}" rx="${radius}" fill="${colors.bg}" stroke="${colors.border}" stroke-width="1" />
 
   <!-- Header -->
   <text x="24" y="40" font-size="18" font-weight="700" fill="${colors.textPrimary}" letter-spacing="-0.3">💬 ${params.lang === "zh" ? "读者笔记" : "Reader Notes"}</text>
@@ -162,10 +184,13 @@ export function renderSVG(
     lines.push(`
   <text x="${nameX}" y="${pc.nameY2}" font-size="12" fill="${colors.textTertiary}">${escapeXml(formatDate(comment.createdAt, params.lang))}</text>`);
 
-    // Body
+    // Body (multi-line support)
     lines.push(`
-  <text x="${nameX}" y="${pc.bodyY}" font-size="${compact ? 13 : 14}" fill="${colors.textSecondary}" letter-spacing="-0.1">
-    <tspan x="${nameX}" dy="0">${escapeXml(comment.content)}</tspan>
+  <text x="${nameX}" y="${pc.bodyY}" font-size="${compact ? 13 : 14}" fill="${colors.textSecondary}" letter-spacing="-0.1">${pc.bodyLines.map((line, i) =>
+    i === 0
+      ? `<tspan x="${nameX}" dy="0">${escapeXml(line)}</tspan>`
+      : `<tspan x="${nameX}" dy="${lineHeight}">${escapeXml(line)}</tspan>`
+  ).join("")}
   </text>`);
 
     // Reactions
